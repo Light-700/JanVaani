@@ -6,37 +6,49 @@ import Dashboard from "./screens/Dashboard";
 import ReportIssue from './screens/ReportIssue';
 import TrackProgress from './screens/TrackProgress';
 import Analytics from './screens/Analytics';
+import { AuthProvider } from './context/AuthContext';
+import Login from './screens/Login';
+import Signup from './screens/Signup';
+import ProtectedRoute from './components/ProtectedRoute';
 import './App.css'
 
 function App() {
     const router = createBrowserRouter([
         {
+            path: "/signup",
+            element: <Signup />
+        },
+        {
+            path: "/login",
+            element: <Login />
+        },
+        {
             path: "/",
-            element: <><Navbar /><Home /></>
+            element: <ProtectedRoute><Navbar /><Home /></ProtectedRoute>
         },
         {
             path: "/dashboard",
-            element: <><Navbar /><Dashboard /></>
+            element: <ProtectedRoute><Navbar /><Dashboard /></ProtectedRoute>
         },
 
         {
             path: "/report",
-            element: <><Navbar /><ReportIssue /></>
+            element: <ProtectedRoute><Navbar /><ReportIssue /></ProtectedRoute>
         },
         {
             path: "/track",
-            element: <><Navbar /><TrackProgress /></>
+            element: <ProtectedRoute><Navbar /><TrackProgress /></ProtectedRoute>
         },
         {
             path: "/analytics",
-            element: <><Navbar /><Analytics /></>
+            element: <ProtectedRoute><Navbar /><Analytics /></ProtectedRoute>
         }
     ]);
 
     return (
-        <>
+        <AuthProvider>
             <RouterProvider router={router} />
-        </>
+        </AuthProvider>
     )
 }
 
