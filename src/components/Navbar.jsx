@@ -26,11 +26,14 @@ const Navbar = () => {
                     <li><NavLink className={(e) => { return e.isActive ? "red" : "" }} to="/track">Track Progress</NavLink></li>
                     <li><NavLink className={(e) => { return e.isActive ? "red" : "" }} to="/analytics">Analytics</NavLink></li>
                     {user && (
-                        <li>
-                            <button onClick={handleLogout} className="btn-logout">
-                                Logout
-                            </button>
-                        </li>
+                        <>
+                            <li><NavLink to="/account">My Account</NavLink></li>
+                            <li>
+                                <button onClick={handleLogout} className="btn-logout">
+                                    Logout
+                                </button>
+                            </li>
+                        </>
                     )}
                 </ul>
             </nav>

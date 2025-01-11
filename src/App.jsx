@@ -1,15 +1,16 @@
 import React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import ProtectedRoute from './components/ProtectedRoute';
+import { AuthProvider } from './context/AuthContext';
 import Home from "./screens/Home";
 import Dashboard from "./screens/Dashboard";
 import ReportIssue from './screens/ReportIssue';
 import TrackProgress from './screens/TrackProgress';
 import Analytics from './screens/Analytics';
-import { AuthProvider } from './context/AuthContext';
 import Login from './screens/Login';
 import Signup from './screens/Signup';
-import ProtectedRoute from './components/ProtectedRoute';
+import MyAccount from './screens/MyAccount';
 import './App.css'
 
 function App() {
@@ -42,6 +43,10 @@ function App() {
         {
             path: "/analytics",
             element: <ProtectedRoute><Navbar /><Analytics /></ProtectedRoute>
+        },
+        {
+            path: "/account",
+            element: <ProtectedRoute><Navbar /><MyAccount /></ProtectedRoute>
         }
     ]);
 
