@@ -1,23 +1,36 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { createUserProfile } from '../services/userService';
 import { useNavigate, Link } from 'react-router-dom';
 import './Login.css'; // Reusing login styles
 
 const Signup = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [displayName, setDisplayName] = useState(''); // Add this line
     const [error, setError] = useState('');
+    const [role, setRole] = useState('citizen');
     const { signup } = useAuth();
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!displayName) {
+            setError('Display name is required');
+            return;
+        }
         try {
             setError('');
-            await signup(email, password);
+            const userCredential = await signup(email, password);
+            await createUserProfile(userCredential.user.uid, {
+                email,
+                role,
+                name: displayName
+            });
             navigate('/');
         } catch (err) {
-            setError('Failed to create an account');
+            console.error('Signup error:', err);
+            setError(err.message || 'Failed to create an account');
         }
     };
 
@@ -26,6 +39,15 @@ const Signup = () => {
             <form className="login-form" onSubmit={handleSubmit}>
                 <h2>Create Account</h2>
                 {error && <div className="error-message">{error}</div>}
+                <div className="form-group">
+                    <label>Display Name</label>
+                    <input
+                        type="text"
+                        value={displayName}
+                        onChange={(e) => setDisplayName(e.target.value)}
+                        required
+                    />
+                </div>
                 <div className="form-group">
                     <label>Email</label>
                     <input
@@ -43,6 +65,17 @@ const Signup = () => {
                         onChange={(e) => setPassword(e.target.value)}
                         required
                     />
+                </div>
+                <div className="form-group">
+                    <label>Role</label>
+                    <select
+                        value={role}
+                        onChange={(e) => setRole(e.target.value)}
+                        required
+                    >
+                        <option value="citizen">Citizen</option>
+                        <option value="admin">Authority</option>
+                    </select>
                 </div>
                 <button type="submit" className="btn btn-primary">
                     Sign Up

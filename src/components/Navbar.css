@@ -30,3 +30,7 @@ a {
 .nav-links a.active {
     color: var(--primary-blue);
 }
+
+.red {
+    background-color: cornflowerblue;
+}

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../config/firebase';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { uploadPhoto } from '../services/photoService';
 import { useNavigate } from 'react-router-dom';
 import './ReportIssue.css';
 
@@ -24,7 +25,7 @@ const ReportIssue = () => {
 
         try {
             // Create issue document
-            await addDoc(collection(db, 'issues'), {
+            const issueRef = await addDoc(collection(db, 'issues'), {
                 description: formData.description,
                 location: formData.location,
                 userId: user.uid,
@@ -32,8 +33,17 @@ const ReportIssue = () => {
                 status: 'pending',
                 createdAt: Timestamp.now(),
                 updatedAt: Timestamp.now(),
-                // Add more fields as needed
             });
+
+            // Upload photo if exists
+            let photoURL = null;
+            if (formData.photo) {
+                photoURL = await uploadPhoto(formData.photo, issueRef.id);
+                // Update issue with photo URL
+                await updateDoc(issueRef, {
+                    photoURL: photoURL
+                });
+            }
 
             // Reset form
             setFormData({

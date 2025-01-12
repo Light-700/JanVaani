@@ -65,6 +65,11 @@ const TrackProgress = () => {
                                 {issue.status}
                             </span>
                         </div>
+                        {issue.photoURL && (
+                            <div className="issue-photo">
+                                <img src={issue.photoURL} alt="Issue" />
+                            </div>
+                        )}
                         <p className="location">📍 {issue.location}</p>
                         <p className="date">🗓️ {issue.date}</p>
                         <p className="reporter">👤 {issue.userEmail}</p>

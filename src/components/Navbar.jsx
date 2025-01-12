@@ -2,9 +2,11 @@ import React from 'react'
 import { NavLink } from 'react-router-dom'
 import './Navbar.css'
 import { useAuth } from '../context/AuthContext';
+import { useAdmin } from '../context/AdminContext';
 
 const Navbar = () => {
     const { user, logout } = useAuth();
+    const { isAdmin } = useAdmin();
 
     const handleLogout = async () => {
         try {
@@ -25,9 +27,14 @@ const Navbar = () => {
                     <li><NavLink className={(e) => { return e.isActive ? "red" : "" }} to="/report">Report Issue</NavLink></li>
                     <li><NavLink className={(e) => { return e.isActive ? "red" : "" }} to="/track">Track Progress</NavLink></li>
                     <li><NavLink className={(e) => { return e.isActive ? "red" : "" }} to="/analytics">Analytics</NavLink></li>
+                    {isAdmin && (
+                        <li>
+                            <NavLink className={(e) => { return e.isActive ? "red" : "" }} to="/admin">Admin Dashboard</NavLink>
+                        </li>
+                    )}
                     {user && (
                         <>
-                            <li><NavLink to="/account">My Account</NavLink></li>
+                            <li><NavLink className={(e) => { return e.isActive ? "red" : "" }} to="/account">My Account</NavLink></li>
                             <li>
                                 <button onClick={handleLogout} className="btn-logout">
                                     Logout
