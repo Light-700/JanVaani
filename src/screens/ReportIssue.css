@@ -34,3 +34,15 @@
     min-height: 150px;
     resize: vertical;
 }
+
+.photo-preview {
+    margin-top: 1rem;
+    max-width: 300px;
+}
+
+.photo-preview img {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

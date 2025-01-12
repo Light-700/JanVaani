@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../config/firebase';
-import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, Timestamp } from 'firebase/firestore';
 import { uploadPhoto } from '../services/photoService';
 import { useNavigate } from 'react-router-dom';
 import './ReportIssue.css';
@@ -13,10 +13,21 @@ const ReportIssue = () => {
         photo: null
     });
 
+    const [photoPreview, setPhotoPreview] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const { user } = useAuth();
     const navigate = useNavigate();
+
+    const handlePhotoChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setFormData({ ...formData, photo: file });
+            // Create preview URL
+            const previewUrl = URL.createObjectURL(file);
+            setPhotoPreview(previewUrl);
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -36,13 +47,17 @@ const ReportIssue = () => {
             });
 
             // Upload photo if exists
-            let photoURL = null;
             if (formData.photo) {
-                photoURL = await uploadPhoto(formData.photo, issueRef.id);
-                // Update issue with photo URL
-                await updateDoc(issueRef, {
-                    photoURL: photoURL
-                });
+                try {
+                    const photoURL = await uploadPhoto(formData.photo, issueRef.id);
+                    // Update issue with photo URL
+                    await updateDoc(issueRef, {
+                        photoURL: photoURL
+                    });
+                } catch (photoError) {
+                    console.error('Error uploading photo:', photoError);
+                    setError('Image upload failed, but issue was reported');
+                }
             }
 
             // Reset form
@@ -91,8 +106,13 @@ const ReportIssue = () => {
                     <input 
                         type="file" 
                         accept="image/*" 
-                        onChange={(e) => setFormData({ ...formData, photo: e.target.files[0] })}
+                        onChange={handlePhotoChange}
                     />
+                    {photoPreview && (
+                        <div className="photo-preview">
+                            <img src={photoPreview} alt="Preview" />
+                        </div>
+                    )}
                 </div>
                 <button 
                     type="submit" 
