@@ -35,3 +35,27 @@
 .auth-switch a:hover {
     text-decoration: underline;
 }
+
+.password-input {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-input input {
+    width: 100%;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+    padding: 5px;
+}
+
+.password-toggle:hover {
+    color: #333;
+}
