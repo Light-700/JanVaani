@@ -1,12 +1,40 @@
 import { useState, useEffect } from 'react';
+import { FaThumbsUp, FaThumbsDown } from 'react-icons/fa';
 import { db } from '../config/firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { handleVote, getVoteCounts } from '../services/voteService';
+import { useAuth } from '../context/AuthContext';
 import './TrackProgress.css';
 
 const TrackProgress = () => {
     const [issues, setIssues] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [voteCounts, setVoteCounts] = useState({});
+    const { user } = useAuth();
+
+    const handleVoteClick = async (issueId, voteType) => {
+        if (!user) return;
+        await handleVote(issueId, user.uid, voteType);
+        // Refresh vote counts
+        const newCounts = await getVoteCounts(issueId);
+        setVoteCounts(prev => ({
+            ...prev,
+            [issueId]: newCounts
+        }));
+    };
+
+    // Fetch vote counts
+    useEffect(() => {
+        const fetchVoteCounts = async () => {
+            const counts = {};
+            for (const issue of issues) {
+                counts[issue.id] = await getVoteCounts(issue.id);
+            }
+            setVoteCounts(counts);
+        };
+        if (issues.length) fetchVoteCounts();
+    }, [issues]);
     
     const formatDate = (timestamp) => {
         return new Intl.DateTimeFormat('en-IN', {
@@ -73,6 +101,24 @@ const TrackProgress = () => {
                         <p className="location">📍 {issue.location}</p>
                         <p className="date">🗓️ {issue.date}</p>
                         <p className="reporter">👤 {issue.userEmail}</p>
+                        <div className="vote-section">
+                            <button 
+                                onClick={() => handleVoteClick(issue.id, 'upvote')}
+                                className="vote-btn upvote"
+                                disabled={!user}
+                            >
+                                <FaThumbsUp />
+                                <span>{voteCounts[issue.id]?.upvotes || 0}</span>
+                            </button>
+                            <button 
+                                onClick={() => handleVoteClick(issue.id, 'downvote')}
+                                className="vote-btn downvote"
+                                disabled={!user}
+                            >
+                                <FaThumbsDown />
+                                <span>{voteCounts[issue.id]?.downvotes || 0}</span>
+                            </button>
+                        </div>
                     </div>
                 ))}
             </div>
